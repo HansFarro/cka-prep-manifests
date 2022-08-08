@@ -1,6 +1,20 @@
 # cka-prep-manifests
+
 Practical guide with manifests to help you to prepare for CKA (Certified Kubenetes Administrator) exam.
 
+## Table of Contents
+
+[Tips](#tips)
+
+[Chapter 2 Scheduling](#chapter-2-scheduling)
+
+[Chapter 3 Monitoring](#chapter-3-monitoring)
+
+[Chapter 4 Application Lifecycle Management](#chapter-4-application-lifecycle-management)
+
+[Chapter 5 Cluster maintenance](#chapter-5-cluster-maintenance)
+
+[Chapter 6 Security](#chapter-6-security)
 ## Tips
 
 Create a deployment without creating in the cluster
@@ -10,7 +24,9 @@ Create a deployment without creating in the cluster
 Force replace of container
 
 `kubectl replace --force -f ubuntu-sleeper-3.yaml`
-## Chapter 2 : Scheduling
+
+## Chapter 2 Scheduling
+
 ### Node Affinity Types
 
 Available
@@ -28,12 +44,13 @@ Planned:
 |Type 2|    Preferred   |    Ignored    |
 |Type 3|    Required    |   Required    |
 
-## Chapter 3: Monitoring
+## Chapter 3 Monitoring
+
 ### Logs - Kubernetes
 
 `kubectl logs -f <pod_name> <container_name>`
 
-## Chapter 4: Application Lifecycle Management
+## Chapter 4 Application Lifecycle Management
 
 ### Rollback
 
@@ -46,6 +63,7 @@ Change container image
 `kubectl set image deployment/<deployment_name> <container_name>=<new_container_image>`
 
 Docker vs Kubernetes
+
 ```bash
 ENTRYPOINT <Array> - command: <Array>
 CMD <Array> - args: <Array>
@@ -54,6 +72,7 @@ CMD <Array> - args: <Array>
 ENV Value Types
 
 1. Key value
+
 ```yaml
 env:
   - name: APP_COLOR
@@ -61,6 +80,7 @@ env:
 ```
 
 2. Config Map
+
 ```yaml
 env:
   - name: APP_COLOR
@@ -69,6 +89,7 @@ env:
 ```
 
 3. Secret
+
 ```yaml
 env:
   - name: APP_COLOR
@@ -83,12 +104,13 @@ env:
 Use envFrom to define all of the Secret's data as container environment variables.
 
 ```yaml
-  envFrom:
-    - secretRef:
-      name: mysecret
+envFrom:
+  - secretRef:
+    name: mysecret
 ```
 
-## Chapter 5: Cluster maintenance
+## Chapter 5 Cluster maintenance
+
 ### OS Upgrades
 
 Drain the node means pods are terminated and node is marked as unschedulable
@@ -147,15 +169,36 @@ Snapshot restore
 
 `etcdctl snapshot restore -h`
 
-Example 
+Example
 
 `etcdctl snapshot restore --data-dir /var/lib/etcd-from-backup /opt/snapshot-pre-boot.db`
 
-Edit this file /etc/kubernetes/manifests/etcd.yaml 
+Edit this file /etc/kubernetes/manifests/etcd.yaml
 
 ```yaml
-hostPath
+hostPath:
   path: <change_this_to_datadir>
 ```
 
-## Chapter 6: Security 
+## Chapter 6 Security
+
+Get content of csr (Certificate Signing Request) for a new user
+
+`cat /root/<file_name>.csr | base64 | tr -d "\n"`
+
+Approve a CSR with kubectl
+
+`kubectl certificate approve <certificate_signing_request_name>`
+
+Deny a CSR with kubectl
+
+`kubectl certificate deny <certificate_signing_request_name>`
+
+Check access
+
+`kubectl auth can-i <command>`
+`kubectl auth can-i create deployments`
+
+Check access as administrator
+
+`kubectl auth can-i <command> --as <role>`
