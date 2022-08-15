@@ -15,15 +15,29 @@ Practical guide with manifests to help you to prepare for CKA (Certified Kubenet
 [Chapter 5 Cluster maintenance](#chapter-5-cluster-maintenance)
 
 [Chapter 6 Security](#chapter-6-security)
+
+[Chapter 7 Storage](#chapter-7-storage)
 ## Tips
 
 Create a deployment without creating in the cluster
 
 `kubectl create deployment --image=nginx nginx --dry-run=client -o yaml`
 
+Make an export variable for that using
+
+`export do='--dry-client -o yaml'`
+
 Force replace of container
 
 `kubectl replace --force -f ubuntu-sleeper-3.yaml`
+
+Organize files per questions : Create a directory and change to it
+
+`mkcd(){ mkdir $@ && cd @; }`
+
+Query ApiVersion and shortnames
+
+`kubectl api-resources`
 
 ## Chapter 2 Scheduling
 
@@ -202,3 +216,64 @@ Check access
 Check access as administrator
 
 `kubectl auth can-i <command> --as <role>`
+
+Get the API groups and resource names from command
+
+`kubectl api-resources`
+
+Create a Secret by providing credentials on the command line
+
+`kubectl create secret docker-registry <secret_name> --docker-server=<your_registry_server> --docker-username=<your_name> --docker-password=<your_pword> --docker-email=<your_email>`
+
+Security contexts at pod level
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: security-context-demo
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+```
+
+Security contexts at container level
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: security-context-demo-4
+spec:
+  containers:
+  - name: sec-ctx-4
+    image: gcr.io/google-samples/node-hello:1.0
+    securityContext:
+      capabilities:
+        add: ["NET_ADMIN", "SYS_TIME"]
+```
+
+Get Network Policies
+
+`kubectl get netpol`
+
+[Real example of a network policy definition](security/2-network-policy.yaml)
+
+## Chapter 7: Storage
+
+### Persistent Volume and Persistent Volume Claim
+
+Get PV and PVC
+
+`kubectl get pv,pvc`
+
+[Example of PV and PVC](storage/pv-pvc.yaml)
+
+### Storage Class
+
+Get storage classes
+
+`kubectl get sc`
+
+[Example of StorageClass and PVC](storage/sc-pvc.yaml)
