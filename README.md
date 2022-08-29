@@ -17,6 +17,10 @@ Practical guide with manifests to help you to prepare for CKA (Certified Kubenet
 [Chapter 6 Security](#chapter-6-security)
 
 [Chapter 7 Storage](#chapter-7-storage)
+
+[Chapter 8 Networking](#chapter-8-networking)
+
+[Chapter 9 Troubleshooting](#chapter-9-troubleshooting)
 ## Tips
 
 Create a deployment without creating in the cluster
@@ -277,3 +281,66 @@ Get storage classes
 `kubectl get sc`
 
 [Example of StorageClass and PVC](storage/sc-pvc.yaml)
+
+## Chapter 8: Networking
+
+- Inside the control plane run the following command to see which network plugin is used:
+
+`ps aux | grep -e "--network-plugin"`
+
+- The CNI binaries are located under */opt/cni/bin* by default.
+
+- To identify which binaries are present in CNI plugin run `ls /opt/cni/bin`
+
+- Run the command: `ls /etc/cni/net.d/` and identify the name of the plugin.
+
+- See executable file `cat /etc/cni/net.d/10-flannel.conflist`.
+
+- See kube-system namespace to see which network solution is used for. `kubectl get po -n kube-system -o wide`
+
+- To know which IP Range is configured for the services within the cluster inspect the following: `cat /etc/kubernetes/manifests/kube-apiserver.yaml | grep cluster-ip-range`
+
+- How the Kubernetes cluster ensure that a kube-proxy pod runs on all nodes?  `k get ds -n kube-system`
+
+### Core DNS
+
+CoreDNS is DNS server that can server as Kubenetes cluster DNS.You can see more info in.
+
+`kubectl describe cm coredns -n kube-system`
+
+[ip_address or hostname of pods or services].[namespace].[type: pod or svc].[dns_server_name]
+
+### Ingress
+
+Format - kubectl create ingress <ingress-name> --rule="host/path=service:port"
+
+Example - kubectl create ingress ingress-test --rule="wear.my-online-store.com/wear*=wear-service:80"
+
+## Chapter 9 Troubleshooting
+
+## Application Failure
+
+To check the Application/Service status of the webserver `curl http://web-service-ip:node-port`
+
+To check the endpoint of the service and compare it with the selectors `kubectl describe service web-service`
+
+## Control Plane Failure
+
+To check status of controlplane services
+
+```bash
+service kube-apiserver status
+service kube-controller-manager status
+service kube-scheduler status
+service kubelet status
+service kube-proxy status
+```
+
+To view the kube-apiserver logs
+`sudo journalctl -u kube-apiserver`
+
+## Scale resources
+
+`kubectl scale --replicas=<number> rs/<release_name>`
+
+`kubectl scale --replicas=<number> deployment/<deployment_name>`
