@@ -344,3 +344,34 @@ To view the kube-apiserver logs
 `kubectl scale --replicas=<number> rs/<release_name>`
 
 `kubectl scale --replicas=<number> deployment/<deployment_name>`
+
+## Worker node failure
+
+`service kubelet status`
+
+`sudo journalctl -u kubelet`
+
+## Check certificates
+
+`openssl x509 -in /var/lib/kubelet/worker-1.crt -text`
+
+## Kubectl tricks
+
+`kubectl get nodes -o=custom-columns=NODE:metadata.name,CPU=.status.capacity.cpu`
+
+Sorting
+
+`kubectl get nodes --sort-by=.metadata.name`
+
+`kubectl get nodes -o=jsonpath='{.items[*].metadata.name}' > /opt/outputs/node_names.txt`
+
+Get users from a kubeconfig file
+
+`kubectl config view --kubeconfig=/root/my-kube-config -o=jsonpath='{.users[*].name}' > /opt/outputs/users.txt`
+
+Sort PV by capacity
+
+`kubectl get pv --sort-by='.spec.capacity.storage`
+
+Use custom columns
+`kubectl get pv --sort-by='.spec.capacity.storage' -o custom-columns=NAME:metadata.name,CAPACITY:.spec.capacity.storage`
